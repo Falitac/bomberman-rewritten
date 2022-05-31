@@ -1,0 +1,7 @@
+*.swp
+*.un~
+*~
+build
+build/*
+!build/assets
+!build/assets/*
