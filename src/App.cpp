@@ -1,5 +1,7 @@
 #include "App.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
 static App* app;
 
 static auto basicShaderLocation = std::string{"assets/shaders/basic"};
@@ -61,6 +63,7 @@ void App::init() {
     fmt::print(stderr, fmt::fg(fmt::color::red), "{}", e.what());
   }
   
+  camera = std::make_unique<FreeCamera>();
 
   timeSinceStart.restart();
 }
@@ -96,6 +99,9 @@ void App::initializeCallbacks() {
   auto mouseCallback = [](GLFWwindow* window, int button, int action, int mods) {
     static_cast<App*>(glfwGetWindowUserPointer(window))->mouseCallback(window, button, action, mods);
   };
+  auto cursorPosCallback = [](GLFWwindow* window, double xpos, double ypos) {
+    static_cast<App*>(glfwGetWindowUserPointer(window))->windowSizeCallback(window, xpos, ypos);
+  };
   auto keyboardCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
     static_cast<App*>(glfwGetWindowUserPointer(window))->keyboardCallback(window, key, scancode, action, mods);
   };
@@ -105,16 +111,20 @@ void App::initializeCallbacks() {
 
   glfwSetErrorCallback(errorCallback);
   glfwSetMouseButtonCallback(window, mouseCallback);
+  glfwSetCursorPosCallback(window, cursorPosCallback);
   glfwSetKeyCallback(window, keyboardCallback);
   glfwSetWindowSizeCallback(window, windowSizeCallback);
 }
 
 void App::mouseCallback(GLFWwindow* window, int button, int action, int mods) {
-  fmt::print(fmt::fg(fmt::color::yellow), "Mouse button\n");
+  app->input.setMouseButtonPressed(button, action);
+}
+
+void App::windowSizeCallback(GLFWwindow* window, double xpos, double ypos) {
+  app->input.setMousePosition(xpos, ypos);
 }
 
 void App::keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  fmt::print(fmt::fg(fmt::color::yellow), "Keyboard\n");
   if(action == GLFW_PRESS) {
     app->input.setKeyPressed(key, true);
   }
@@ -172,6 +182,7 @@ void App::inputHandler() {
     basicShader.destroy();
     basicShader = {basicShaderLocation};
   }
+  camera->handleInput(*this);
 }
 
 void App::close() {
@@ -191,6 +202,15 @@ void App::render() {
   prepareRender();
 
   basicShader.use();
+  auto view = camera->getView();
+  auto projection = camera->getProjection(getAspect());
+
+  auto uViewID = basicShader.findUniform("uView");
+  auto uProjectionID = basicShader.findUniform("uProjection");
+
+  glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
+
   glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, nullptr);
 }
 

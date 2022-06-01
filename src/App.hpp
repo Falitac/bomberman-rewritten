@@ -38,12 +38,15 @@ public:
   }
   void close();
 
+  friend class Input;
+  Input input;
 private:
   void init();
 
   void initializeWindowContext();
   void initializeCallbacks();
   void mouseCallback(GLFWwindow* window, int button, int action, int mods);
+  void windowSizeCallback(GLFWwindow* window, double xpos, double ypos);
   void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
   void windowSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -58,7 +61,6 @@ private:
   int height;
   bool running;
 
-  Input input;
 
   void showPerformanceInfo();
   Time::Timer timeSinceStart;

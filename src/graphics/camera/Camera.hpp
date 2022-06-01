@@ -5,14 +5,16 @@
 
 #include "../../Input.hpp"
 
+class App;
+
 class Camera {
 public:
   virtual glm::mat4 getView() = 0;
-  virtual glm::mat4 getProjection() = 0;
+  virtual glm::mat4 getProjection(float aspect) = 0;
 
-  virtual void handleInput(Input& input) = 0;
+  virtual void handleInput(App& app) = 0;
 
-private:
+protected:
   glm::mat4 view;
   glm::mat4 projection;
   glm::vec3 position;
