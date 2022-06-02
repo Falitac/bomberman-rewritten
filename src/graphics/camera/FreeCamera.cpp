@@ -23,7 +23,9 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
 void FreeCamera::handleInput(App& app) {
   float dt = app.getDt();
   Input& input = app.input;
-  auto angleRotationSpeed = 10.3f;
+  aspect = app.getAspect();
+
+
   if(input.isKeyPressed(GLFW_KEY_SPACE)) {
     app.hideCursor();
     auto mouseOffset = input.centerizeMouse(app);
@@ -100,6 +102,6 @@ glm::mat4 FreeCamera::getView() {
   return glm::lookAt(position, position + direction, up);
 }
 
-glm::mat4 FreeCamera::getProjection(float aspect) {
+glm::mat4 FreeCamera::getProjection() {
   return glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
 }

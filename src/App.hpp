@@ -12,6 +12,7 @@
 #include "utility/stb_image.h"
 #include "Input.hpp"
 #include "graphics/Shader.hpp"
+#include "graphics/Skybox.hpp"
 #include "graphics/camera/Camera.hpp"
 #include "graphics/camera/FreeCamera.hpp"
 #include "AssetManager.hpp"
@@ -77,4 +78,5 @@ private:
 
   AssetManager assets;
   CameraPtr camera;
+  std::unique_ptr<Skybox> skybox;
 };

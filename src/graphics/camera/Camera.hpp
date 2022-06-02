@@ -10,7 +10,7 @@ class App;
 class Camera {
 public:
   virtual glm::mat4 getView() = 0;
-  virtual glm::mat4 getProjection(float aspect) = 0;
+  virtual glm::mat4 getProjection() = 0;
 
   virtual void handleInput(App& app) = 0;
 
@@ -18,6 +18,7 @@ protected:
   glm::mat4 view;
   glm::mat4 projection;
   glm::vec3 position;
+  float aspect;
 };
 
 using CameraPtr = std::unique_ptr<Camera>;

@@ -30,6 +30,7 @@ void App::run() {
 
 void App::init() {
   initializeWindowContext();
+  initializeOpenGLOptions();
   initializeCallbacks();
   
   glGenVertexArrays(1, &vao);
@@ -70,15 +71,34 @@ void App::init() {
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
 
+/*
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X 0x8515
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X 0x8516
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y 0x8517
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 0x8518
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z 0x8519
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 0x851A
+*/
+
   assets.addTexture("low-poly", "assets/textures/low-poly.png");
   assets.addCubemap("skybox", {
     "assets/textures/penguins/arid_rt.jpg",
     "assets/textures/penguins/arid_lf.jpg",
-    "assets/textures/penguins/arid_ft.jpg",
-    "assets/textures/penguins/arid_bk.jpg",
     "assets/textures/penguins/arid_up.jpg",
     "assets/textures/penguins/arid_dn.jpg",
+    "assets/textures/penguins/arid_bk.jpg",
+    "assets/textures/penguins/arid_ft.jpg",
   });
+  assets.addCubemap("skybox-blue", {
+    "assets/textures/blue_skybox/bkg1_right.png",
+    "assets/textures/blue_skybox/bkg1_left.png",
+    "assets/textures/blue_skybox/bkg1_top.png",
+    "assets/textures/blue_skybox/bkg1_bot.png",
+    "assets/textures/blue_skybox/bkg1_front.png",
+    "assets/textures/blue_skybox/bkg1_back.png",
+  });
+  skybox = std::make_unique<Skybox>();
+  fmt::print("im Hreer\n");
 
   timeSinceStart.restart();
 }
@@ -106,7 +126,7 @@ void App::initializeWindowContext() {
 }
 
 void App::initializeOpenGLOptions() {
-  glEnable(GL_DEPTH_BUFFER);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void App::initializeCallbacks() {
@@ -222,6 +242,7 @@ void App::showCursor() {
 }
 
 void App::update() {
+
   camera->handleInput(*this);
 }
 
@@ -231,7 +252,7 @@ void App::render() {
   auto& basicShader = assets.getShader("basic");
   basicShader.use();
   auto view = camera->getView();
-  auto projection = camera->getProjection(getAspect());
+  auto projection = camera->getProjection();
 
   auto uViewID = basicShader.findUniform("uView");
   auto uProjectionID = basicShader.findUniform("uProjection");
@@ -242,7 +263,12 @@ void App::render() {
   glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
 
+  glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, nullptr);
+
+  auto& skyboxCubemap = assets.getCubemap("skybox-blue");
+  auto& skyboxShader = assets.getShader("skybox");
+  skybox->render(skyboxShader, skyboxCubemap, camera);
 }
 
 void App::prepareRender() {
