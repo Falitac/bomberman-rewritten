@@ -20,7 +20,7 @@ public:
     void setKeyPressed(int key, int value);
     void setMouseButtonPressed(int key, int value);
     void setMousePosition(double xpos, double ypos);
-    void centerizeMouse(App& app);
+    glm::vec2 centerizeMouse(App& app);
 
     bool isKeyPressed(int key);
     bool isMouseButtonPressed(MButton button);
@@ -29,13 +29,6 @@ public:
     const std::map<int, bool>& getKeys() const;
     glm::vec2 getMousePosition() const {
         return {mouse.xpos, mouse.ypos};
-    }
-    glm::vec2 getMouseOffset() {
-        auto xoffset = mouse.xposLast - mouse.xpos;
-        auto yoffset = mouse.yposLast - mouse.ypos;
-        mouse.xposLast = mouse.xpos;
-        mouse.yposLast = mouse.ypos;
-        return {xoffset, yoffset};
     }
 private:
     friend class App;
@@ -49,7 +42,5 @@ private:
 
         double xpos;
         double ypos;
-        double xposLast;
-        double yposLast;
     } mouse;
 };

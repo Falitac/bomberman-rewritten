@@ -18,7 +18,7 @@ App::~App() {
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
   glDeleteBuffers(1, &ebo);
-  basicShader.destroy();
+  fmt::print("Test~App()\n");
 
   glfwTerminate();
 }
@@ -37,10 +37,10 @@ void App::init() {
   glGenBuffers(1, &ebo);
 
   float vertices[] = {
-    -1.0f, -1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f,
-    -1.0f, 1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    -1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
   };
   unsigned int indices[] = {
     0, 1, 2,
@@ -55,15 +55,30 @@ void App::init() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), nullptr);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), (void*) (3 * sizeof(float)));
 
   try {
-    basicShader = {basicShaderLocation};
+    assets.addShader("basic", basicShaderLocation);
+    assets.addShader("skybox", "assets/shaders/skybox");
   } catch(const std::exception& e) {
     fmt::print(stderr, fmt::fg(fmt::color::red), "{}", e.what());
   }
   
-  camera = std::make_unique<FreeCamera>();
+  FreeCamera freeCamera({0.f, 1.f, 3.f});
+  freeCamera.setSensitivity(0.08f);
+  camera = std::make_unique<FreeCamera>(freeCamera);
+
+  assets.addTexture("low-poly", "assets/textures/low-poly.png");
+  assets.addCubemap("skybox", {
+    "assets/textures/penguins/arid_rt.jpg",
+    "assets/textures/penguins/arid_lf.jpg",
+    "assets/textures/penguins/arid_ft.jpg",
+    "assets/textures/penguins/arid_bk.jpg",
+    "assets/textures/penguins/arid_up.jpg",
+    "assets/textures/penguins/arid_dn.jpg",
+  });
 
   timeSinceStart.restart();
 }
@@ -88,6 +103,10 @@ void App::initializeWindowContext() {
     throw std::runtime_error("GLEW error");
   }
   glfwSwapInterval(1);
+}
+
+void App::initializeOpenGLOptions() {
+  glEnable(GL_DEPTH_BUFFER);
 }
 
 void App::initializeCallbacks() {
@@ -179,18 +198,10 @@ void App::inputHandler() {
   }
   if(input.checkSinglePress(GLFW_KEY_Z)) {
     fmt::print(fmt::fg(fmt::color::beige), "Shader reload\n");
-    basicShader.destroy();
-    basicShader = {basicShaderLocation};
+    auto& basic = assets.getShader("basic");
+    basic.destroy();
+    basic = {basicShaderLocation};
   }
-  camera->handleInput(*this);
-}
-
-void App::close() {
-  running = false;
-}
-
-void App::update() {
-
 }
 
 void App::showPerformanceInfo() {
@@ -198,15 +209,35 @@ void App::showPerformanceInfo() {
   fpsCounter = tickCounter = 0;
 }
 
+void App::close() {
+  running = false;
+}
+
+void App::hideCursor() {
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+}
+
+void App::showCursor() {
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); 
+}
+
+void App::update() {
+  camera->handleInput(*this);
+}
+
 void App::render() {
   prepareRender();
 
+  auto& basicShader = assets.getShader("basic");
   basicShader.use();
   auto view = camera->getView();
   auto projection = camera->getProjection(getAspect());
 
   auto uViewID = basicShader.findUniform("uView");
   auto uProjectionID = basicShader.findUniform("uProjection");
+  auto uTexture = basicShader.findUniform("Texture");
+
+  assets.getTexture("low-poly").use();
 
   glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
@@ -216,5 +247,5 @@ void App::render() {
 
 void App::prepareRender() {
   glClearColor(0.1, 0.2, 0.3, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

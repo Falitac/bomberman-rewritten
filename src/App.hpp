@@ -37,6 +37,8 @@ public:
       return dt;
   }
   void close();
+  void hideCursor();
+  void showCursor();
 
   friend class Input;
   Input input;
@@ -44,6 +46,7 @@ private:
   void init();
 
   void initializeWindowContext();
+  void initializeOpenGLOptions();
   void initializeCallbacks();
   void mouseCallback(GLFWwindow* window, int button, int action, int mods);
   void windowSizeCallback(GLFWwindow* window, double xpos, double ypos);
@@ -68,7 +71,6 @@ private:
   int tickCounter = 0;
   int fpsCounter = 0;
 
-  Shader basicShader;
   GLuint vao;
   GLuint vbo;
   GLuint ebo;

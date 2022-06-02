@@ -1,66 +1,98 @@
 #include "../../App.hpp"
 #include "FreeCamera.hpp"
 
+#include <algorithm>
 #include <glfw/glfw3.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <fmt/core.h>
 
-FreeCamera::FreeCamera(float fov, glm::vec3 position)
+FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float speed)
 : fov(fov)
 , pitch(0.f)
 , yaw (-90.f)
 , up(glm::vec3{0.f, 1.f, 0.f})
-, sensitivity(0.05f)
+, sensitivity(sensitivity)
+, speed(speed)
+, maxOffsetHistory(8)
 {
+  assert(maxOffsetHistory < 32);
   this->position = position;
 }
 
 void FreeCamera::handleInput(App& app) {
+  float dt = app.getDt();
   Input& input = app.input;
   auto angleRotationSpeed = 10.3f;
   if(input.isKeyPressed(GLFW_KEY_SPACE)) {
-    input.centerizeMouse(app);
-    auto mouseOffset = input.getMouseOffset();
-    fmt::print(fmt::fg(fmt::color::blanched_almond), "Offset: {}x{}\n", mouseOffset.x, mouseOffset.y);
+    app.hideCursor();
+    auto mouseOffset = input.centerizeMouse(app);
+    calculateAngleChanges(mouseOffset);
+  } else {
+    app.showCursor();
+  }
+  calculatePosition(input, dt);
+  calculateVectors();
+}
 
-    yaw += mouseOffset.x * sensitivity;
-    pitch -= mouseOffset.y * sensitivity;
+void FreeCamera::calculateAngleChanges(glm::vec2& mouseOffset) {
+  if(offsetHistory.size() < maxOffsetHistory) { 
+    offsetHistory.push_back(mouseOffset);
+  } else {
+    offsetHistory.back() = mouseOffset;
+    glm::vec2 avg = {0.0, 0.0};
+    float totalDenominator = 0.0f;
+    float weightChange = 2.f;
+    for(size_t i = 0; i < offsetHistory.size(); i++) {
+      float weight = i * i * weightChange;
+      avg += offsetHistory[i] * weight;
+      totalDenominator += weight;
+    }
+    mouseOffset = avg / totalDenominator;
+    std::rotate(offsetHistory.begin(), offsetHistory.begin() + 1, offsetHistory.end());
   }
 
-  if(pitch > 90.f) {
-    pitch = 90.f;
-  }
-  if(pitch < -90.f) {
-    pitch = -90.f;
-  }
+  yaw += mouseOffset.x * sensitivity;
+  pitch -= mouseOffset.y * sensitivity;
 
-  auto speed = 0.05f;
+  if(pitch > 89.f) {
+    pitch = 89.f;
+  }
+  if(pitch < -89.f) {
+    pitch = -89.f;
+  }
+}
+
+void FreeCamera::calculatePosition(Input& input, float dt) {
+  auto positionChange = glm::vec3{0.f};
   if(input.isKeyPressed(GLFW_KEY_W)) {
-    position += direction * speed;
+    positionChange += direction * speed;
   }
   if(input.isKeyPressed(GLFW_KEY_S)) {
-    position -= direction * speed;
+    positionChange -= direction * speed;
   }
   if(input.isKeyPressed(GLFW_KEY_A)) {
-    position -= right * speed;
+    positionChange -= right * speed;
   }
   if(input.isKeyPressed(GLFW_KEY_D)) {
-    position += right * speed;
+    positionChange += right * speed;
   }
   if(input.isKeyPressed(GLFW_KEY_R)) {
-    position += up * speed;
+    positionChange += up * speed;
   }
   if(input.isKeyPressed(GLFW_KEY_F)) {
-    position -= up * speed;
+    positionChange -= up * speed;
   }
+  position += dt * positionChange;
+}
+
+void FreeCamera::calculateVectors() {
   auto cosPitch = glm::cos(glm::radians(pitch));
   direction = glm::vec3{
     glm::cos(glm::radians(yaw)) * cosPitch,
     glm::sin(glm::radians(pitch)),
     glm::sin(glm::radians(yaw)) * cosPitch
   };
-  direction = glm::normalize(direction);
   right = glm::normalize(glm::cross(direction, up));
 }
 
@@ -69,5 +101,5 @@ glm::mat4 FreeCamera::getView() {
 }
 
 glm::mat4 FreeCamera::getProjection(float aspect) {
-  return glm::perspective(glm::radians(45.f), aspect, 0.1f, 600.f);
+  return glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
 }

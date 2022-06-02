@@ -42,14 +42,15 @@ void Input::setMouseButtonPressed(int key, int value) {
 }
 
 void Input::setMousePosition(double xpos, double ypos) {
-  //mouse.xposLast = mouse.xpos;
-  //mouse.yposLast = mouse.ypos;
   mouse.xpos = xpos;
   mouse.ypos = ypos;
 }
 
-void Input::centerizeMouse(App& app) {
+glm::vec2 Input::centerizeMouse(App& app) {
+  double xpos, ypos;
+  glfwGetCursorPos(app.window, &xpos, &ypos);
   glfwSetCursorPos(app.window, app.getWidth() / 2, app.getHeight() / 2);
+  return {xpos - app.getWidth() / 2, ypos - app.getHeight() / 2};
 }
 
 bool Input::checkSinglePress(int key) {
