@@ -29,6 +29,11 @@ void Texture::loadFromFile(const std::string& location) {
   stbi_image_free(data);
 }
 
+void Texture::setParameter(GLenum param, GLenum value) {
+  use();
+  glTexParameteri(GL_TEXTURE_2D, param, value);
+}
+
 void Texture::create() {
   glCreateTextures(GL_TEXTURE_2D, 1, &id);
   use();

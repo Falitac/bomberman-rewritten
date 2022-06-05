@@ -5,7 +5,6 @@
 #include "../utility/stb_image.h"
 
 Cubemap::Cubemap() {
-
 }
 
 void Cubemap::loadFromFile(const std::array<std::string, 6>& locations) {

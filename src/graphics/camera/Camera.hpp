@@ -9,8 +9,12 @@ class App;
 
 class Camera {
 public:
+  // @TODO change to returning by reference
   virtual glm::mat4 getView() = 0;
   virtual glm::mat4 getProjection() = 0;
+  inline glm::vec3& getPosition() {
+    return position;
+  }
 
   virtual void handleInput(App& app) = 0;
 

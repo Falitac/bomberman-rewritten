@@ -1,7 +1,6 @@
 #include "AssetManager.hpp"
 
 AssetManager::~AssetManager() {
-  fmt::print("Test~Asset()\n");
   for(auto& [name, texture] : textures) {
     texture.destroy();
   }
@@ -19,12 +18,7 @@ void AssetManager::addTexture(const std::string& name,
     fmt::print(fmt::fg(fmt::color::sea_green), "Texture {} already exists\n");
     return;
   }
-  Texture texture(location);
-  textures.insert(std::make_pair(name, texture));
-}
-
-Texture& AssetManager::getTexture(const std::string& name) {
-  return textures[name];
+  textures.insert(std::make_pair(name, Texture{location}));
 }
 
 void AssetManager::addCubemap(const std::string& name,
@@ -38,18 +32,21 @@ void AssetManager::addCubemap(const std::string& name,
   cubemaps.insert(std::make_pair(name, cubemap));
 }
 
-Cubemap& AssetManager::getCubemap(const std::string& name) {
-  return cubemaps[name];
-}
-
 void AssetManager::addShader(const std::string& name,
                              const std::string& location) {
   if(shaders.contains(name)) {
     fmt::print(fmt::fg(fmt::color::sea_green), "Shader {} already exists\n");
     return;
   }
-  Shader shader = {location};
-  shaders.insert(std::make_pair(name, shader));
+  shaders.insert(std::make_pair(name, Shader{location}));
+}
+
+Texture& AssetManager::getTexture(const std::string& name) {
+  return textures[name];
+}
+
+Cubemap& AssetManager::getCubemap(const std::string& name) {
+  return cubemaps[name];
 }
 
 Shader& AssetManager::getShader(const std::string& name) {

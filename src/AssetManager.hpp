@@ -13,12 +13,11 @@ class AssetManager {
     ~AssetManager();
 
     void addTexture(const std::string& name, const std::string& location);
-    Texture& getTexture(const std::string& name);
-
     void addCubemap(const std::string& name, const std::array<std::string, 6>& locations);
-    Cubemap& getCubemap(const std::string& name);
-
     void addShader(const std::string& name, const std::string& location);
+
+    Texture& getTexture(const std::string& name);
+    Cubemap& getCubemap(const std::string& name);
     Shader& getShader(const std::string& name);
 
    private:

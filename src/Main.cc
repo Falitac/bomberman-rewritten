@@ -1,6 +1,7 @@
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include "App.hpp"
+#include "utility/GLUtils.hpp"
 
 int main(int argc, char** argv) {
   try {

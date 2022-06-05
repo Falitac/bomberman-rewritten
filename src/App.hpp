@@ -16,6 +16,8 @@
 #include "graphics/camera/Camera.hpp"
 #include "graphics/camera/FreeCamera.hpp"
 #include "AssetManager.hpp"
+#include "utility/GLUtils.hpp"
+#include "graphics/Mesh.hpp"
 
 class App {
 public:
@@ -47,8 +49,10 @@ private:
   void init();
 
   void initializeWindowContext();
-  void initializeOpenGLOptions();
   void initializeCallbacks();
+  void initializeOpenGLOptions();
+  void loadAssets();
+
   void mouseCallback(GLFWwindow* window, int button, int action, int mods);
   void windowSizeCallback(GLFWwindow* window, double xpos, double ypos);
   void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -72,11 +76,8 @@ private:
   int tickCounter = 0;
   int fpsCounter = 0;
 
-  GLuint vao;
-  GLuint vbo;
-  GLuint ebo;
-
   AssetManager assets;
   CameraPtr camera;
-  std::unique_ptr<Skybox> skybox;
+  Skybox skybox;
+  Mesh mesh;
 };

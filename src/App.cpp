@@ -15,90 +15,64 @@ App::App()
 }
 
 App::~App() {
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vbo);
-  glDeleteBuffers(1, &ebo);
   fmt::print("Test~App()\n");
 
+  skybox.destroy();
+  mesh.destroy();
   glfwTerminate();
 }
 
 void App::run() {
   init();
   loop();
+  checkGLerrors(__LINE__);
 }
 
 void App::init() {
   initializeWindowContext();
   initializeOpenGLOptions();
   initializeCallbacks();
-  
-  glGenVertexArrays(1, &vao);
-  glGenBuffers(1, &vbo);
-  glGenBuffers(1, &ebo);
+  //generateSimpleMesh();
+  loadAssets();
 
-  float vertices[] = {
-    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    -1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-  };
-  unsigned int indices[] = {
-    0, 1, 2,
-    0, 3, 1
-  };
-
-  glBindVertexArray(vao);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), nullptr);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), (void*) (3 * sizeof(float)));
-
-  try {
-    assets.addShader("basic", basicShaderLocation);
-    assets.addShader("skybox", "assets/shaders/skybox");
-  } catch(const std::exception& e) {
-    fmt::print(stderr, fmt::fg(fmt::color::red), "{}", e.what());
-  }
-  
   FreeCamera freeCamera({0.f, 1.f, 3.f});
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
 
-/*
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_X 0x8515
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X 0x8516
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y 0x8517
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 0x8518
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z 0x8519
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 0x851A
-*/
+  static std::vector<glm::vec3> pos = {
+    {-1.f, -1.f, -1.f},
+    {1.f, -1.f, -1.f},
+    {1.f, 1.f, -1.f},
+    {-1.f, 1.f, -1.f},
+    {-1.f, -1.f, 1.f},
+    {1.f, -1.f, 1.f},
+    {1.f, 1.f, 1.f},
+    {-1.f, 1.f, 1.f}
+  };
+  static std::vector<glm::vec3> normals = {
+    {0.f, 0.f, 1.f},
+    {1.f, 0.f, 0.f},
+    {0.f, 0.f, -1.f},
+    {-1.f, 0.f, 0.f},
+    {0.f, 1.f, 0.f},
+    {0.f, -1.f, 0.f},
+  };
+  std::vector<unsigned int> indices = {
+    0, 1, 3, 3, 1, 2,
+    1, 5, 2, 2, 5, 6,
+    5, 4, 6, 6, 4, 7,
+    4, 0, 7, 7, 0, 3,
+    3, 2, 7, 7, 2, 6,
+    4, 5, 0, 0, 5, 1
+  };
+  std::vector<Vertex> vertices;
 
-  assets.addTexture("low-poly", "assets/textures/low-poly.png");
-  assets.addCubemap("skybox", {
-    "assets/textures/penguins/arid_rt.jpg",
-    "assets/textures/penguins/arid_lf.jpg",
-    "assets/textures/penguins/arid_up.jpg",
-    "assets/textures/penguins/arid_dn.jpg",
-    "assets/textures/penguins/arid_bk.jpg",
-    "assets/textures/penguins/arid_ft.jpg",
-  });
-  assets.addCubemap("skybox-blue", {
-    "assets/textures/blue_skybox/bkg1_right.png",
-    "assets/textures/blue_skybox/bkg1_left.png",
-    "assets/textures/blue_skybox/bkg1_top.png",
-    "assets/textures/blue_skybox/bkg1_bot.png",
-    "assets/textures/blue_skybox/bkg1_front.png",
-    "assets/textures/blue_skybox/bkg1_back.png",
-  });
-  skybox = std::make_unique<Skybox>();
-  fmt::print("im Hreer\n");
+  for(int i = 0; i < 8; i++) {
+    Vertex v{pos[i], normals[i], {0.f, 0.f}};
+    vertices.push_back(std::move(v));
+  }
+
+  mesh.loadData(vertices, indices);
 
   timeSinceStart.restart();
 }
@@ -127,6 +101,54 @@ void App::initializeWindowContext() {
 
 void App::initializeOpenGLOptions() {
   glEnable(GL_DEPTH_TEST);
+}
+
+void App::loadAssets() {
+  try {
+    assets.addShader("basic", basicShaderLocation);
+    assets.addShader("basic2", "assets/shaders/basic2");
+    assets.addShader("skybox", "assets/shaders/skybox");
+  } catch(const std::exception& e) {
+    fmt::print(stderr, fmt::fg(fmt::color::red), "{}", e.what());
+  }
+
+  assets.addTexture("low-poly", "assets/textures/low-poly.png");
+
+  /*
+  assets.addCubemap("skybox", {
+    "assets/textures/penguins/arid_rt.jpg",
+    "assets/textures/penguins/arid_lf.jpg",
+    "assets/textures/penguins/arid_up.jpg",
+    "assets/textures/penguins/arid_dn.jpg",
+    "assets/textures/penguins/arid_bk.jpg",
+    "assets/textures/penguins/arid_ft.jpg",
+  });
+  assets.addCubemap("skybox-blue", {
+    "assets/textures/blue_skybox/bkg1_right.png",
+    "assets/textures/blue_skybox/bkg1_left.png",
+    "assets/textures/blue_skybox/bkg1_top.png",
+    "assets/textures/blue_skybox/bkg1_bot.png",
+    "assets/textures/blue_skybox/bkg1_front.png",
+    "assets/textures/blue_skybox/bkg1_back.png",
+  });
+  assets.addCubemap("skybox-lightblue", {
+    "assets/textures/lightblue/right.png",
+    "assets/textures/lightblue/left.png",
+    "assets/textures/lightblue/top.png",
+    "assets/textures/lightblue/bot.png",
+    "assets/textures/lightblue/front.png",
+    "assets/textures/lightblue/back.png",
+  });
+  */
+  assets.addCubemap("skybox-lightblue", {
+    "assets/textures/lightblue/right.png",
+    "assets/textures/lightblue/left.png",
+    "assets/textures/lightblue/top.png",
+    "assets/textures/lightblue/bot.png",
+    "assets/textures/lightblue/front.png",
+    "assets/textures/lightblue/back.png",
+  });
+  skybox.create();
 }
 
 void App::initializeCallbacks() {
@@ -206,10 +228,10 @@ void App::loop() {
     if(performanceInfoTimer.count() > 1.) {
       performanceInfoTimer.restart();
       showPerformanceInfo();
+      checkGLerrors(__LINE__);
     }
     fpsCounter++;
   }
-  glfwDestroyWindow(window);
 }
 
 void App::inputHandler() {
@@ -218,9 +240,9 @@ void App::inputHandler() {
   }
   if(input.checkSinglePress(GLFW_KEY_Z)) {
     fmt::print(fmt::fg(fmt::color::beige), "Shader reload\n");
-    auto& basic = assets.getShader("basic");
+    auto& basic = assets.getShader("basic2");
     basic.destroy();
-    basic = {basicShaderLocation};
+    basic = {"assets/shaders/basic2"};
   }
 }
 
@@ -242,33 +264,18 @@ void App::showCursor() {
 }
 
 void App::update() {
-
   camera->handleInput(*this);
 }
 
 void App::render() {
   prepareRender();
 
-  auto& basicShader = assets.getShader("basic");
-  basicShader.use();
-  auto view = camera->getView();
-  auto projection = camera->getProjection();
-
-  auto uViewID = basicShader.findUniform("uView");
-  auto uProjectionID = basicShader.findUniform("uProjection");
-  auto uTexture = basicShader.findUniform("Texture");
-
-  assets.getTexture("low-poly").use();
-
-  glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
-
-  glBindVertexArray(vao);
-  glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, nullptr);
-
-  auto& skyboxCubemap = assets.getCubemap("skybox-blue");
-  auto& skyboxShader = assets.getShader("skybox");
-  skybox->render(skyboxShader, skyboxCubemap, camera);
+  mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
+  skybox.render(
+    assets.getShader("skybox"),
+    assets.getCubemap("skybox-lightblue"),
+    camera
+  );
 }
 
 void App::prepareRender() {

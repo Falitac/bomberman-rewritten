@@ -14,7 +14,7 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
 , up(glm::vec3{0.f, 1.f, 0.f})
 , sensitivity(sensitivity)
 , speed(speed)
-, maxOffsetHistory(8)
+, maxOffsetHistory(16)
 {
   assert(maxOffsetHistory < 32);
   this->position = position;
@@ -46,7 +46,7 @@ void FreeCamera::calculateAngleChanges(glm::vec2& mouseOffset) {
     float totalDenominator = 0.0f;
     float weightChange = 2.f;
     for(size_t i = 0; i < offsetHistory.size(); i++) {
-      float weight = i * i * weightChange;
+      float weight = (1 << i) * weightChange;
       avg += offsetHistory[i] * weight;
       totalDenominator += weight;
     }

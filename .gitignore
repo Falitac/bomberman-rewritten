@@ -3,5 +3,9 @@
 *~
 build
 build/*
+fmt
+fmt/*
+freetype
+freetype/*
 !build/assets
 !build/assets/*

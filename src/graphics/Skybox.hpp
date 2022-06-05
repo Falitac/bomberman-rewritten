@@ -14,6 +14,7 @@ public:
 
   void render(Shader& shader, Cubemap& cubemap,
               const CameraPtr& camera);
+  void create();
   void destroy();
 private:
   GLuint vao;

@@ -5,6 +5,30 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Skybox::Skybox() {
+}
+
+void Skybox::render(Shader& shader, Cubemap& cubemap,
+                    const CameraPtr& camera) {
+  glDepthFunc(GL_LEQUAL);
+  glBindVertexArray(vao);
+  
+  cubemap.use();
+  glActiveTexture(GL_TEXTURE0);
+  shader.use();
+
+  auto view = glm::mat4{glm::mat3{camera->getView()}};
+  auto projection = camera->getProjection();
+  auto uViewID = shader.findUniform("View");
+  auto uProjectionID = shader.findUniform("Projection");
+
+  glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
+
+  glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+  glDepthFunc(GL_LESS);
+}
+
+void Skybox::create() {
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
   glGenBuffers(1, &ebo);
@@ -40,25 +64,6 @@ Skybox::Skybox() {
   glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertices[0]), nullptr);
 
   glBindVertexArray(0);
-}
-
-void Skybox::render(Shader& shader, Cubemap& cubemap,
-                    const CameraPtr& camera) {
-  glDepthFunc(GL_LEQUAL);
-  glBindVertexArray(vao);
-  
-  cubemap.use();
-  glActiveTexture(GL_TEXTURE0);
-  shader.use();
-
-  auto view = glm::mat4{glm::mat3{camera->getView()}};
-  auto projection = camera->getProjection();
-  auto uViewID = shader.findUniform("View");
-  auto uProjectionID = shader.findUniform("Projection");
-  glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
-  glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-  glDepthFunc(GL_LESS);
 }
 
 void Skybox::destroy() {
