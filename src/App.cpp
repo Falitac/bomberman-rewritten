@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 static App* app;
+extern AssetManager& _Assets;
 
 static auto basicShaderLocation = std::string{"assets/shaders/basic"};
 
@@ -32,14 +33,13 @@ void App::init() {
   initializeWindowContext();
   initializeOpenGLOptions();
   initializeCallbacks();
-  //generateSimpleMesh();
   loadAssets();
 
   FreeCamera freeCamera({0.f, 1.f, 3.f});
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
 
-  static std::vector<glm::vec3> pos = {
+  std::vector<glm::vec3> pos = {
     {-1.f, -1.f, -1.f},
     {1.f, -1.f, -1.f},
     {1.f, 1.f, -1.f},
@@ -49,14 +49,10 @@ void App::init() {
     {1.f, 1.f, 1.f},
     {-1.f, 1.f, 1.f}
   };
-  static std::vector<glm::vec3> normals = {
-    {0.f, 0.f, 1.f},
-    {1.f, 0.f, 0.f},
-    {0.f, 0.f, -1.f},
-    {-1.f, 0.f, 0.f},
-    {0.f, 1.f, 0.f},
-    {0.f, -1.f, 0.f},
-  };
+  std::vector<glm::vec3> normals(8);
+  for(int i = 0; i < pos.size(); i++) {
+    normals[i] = glm::normalize(pos[i]);
+  }
   std::vector<unsigned int> indices = {
     0, 1, 3, 3, 1, 2,
     1, 5, 2, 2, 5, 6,
@@ -65,14 +61,24 @@ void App::init() {
     3, 2, 7, 7, 2, 6,
     4, 5, 0, 0, 5, 1
   };
+  std::vector<glm::vec2> uvs = {
+    {0.0, 0.0},
+    {0.0, 1.0},
+    {1.0, 1.0},
+    {1.0, 0.0},
+    {0.0, 0.0},
+    {0.0, 1.0},
+    {1.0, 1.0},
+    {1.0, 0.0},
+  };
   std::vector<Vertex> vertices;
 
-  for(int i = 0; i < 8; i++) {
-    Vertex v{pos[i], normals[i], {0.f, 0.f}};
+  for(int i = 0; i < pos.size(); i++) {
+    Vertex v{pos[i], normals[i], uvs[i]};
     vertices.push_back(std::move(v));
   }
 
-  mesh.loadData(vertices, indices);
+  mesh.loadData(vertices, indices, {"wood-diff", "wood-spec", "wood-norm"});
 
   timeSinceStart.restart();
 }
@@ -114,23 +120,10 @@ void App::loadAssets() {
 
   assets.addTexture("low-poly", "assets/textures/low-poly.png");
 
-  /*
-  assets.addCubemap("skybox", {
-    "assets/textures/penguins/arid_rt.jpg",
-    "assets/textures/penguins/arid_lf.jpg",
-    "assets/textures/penguins/arid_up.jpg",
-    "assets/textures/penguins/arid_dn.jpg",
-    "assets/textures/penguins/arid_bk.jpg",
-    "assets/textures/penguins/arid_ft.jpg",
-  });
-  assets.addCubemap("skybox-blue", {
-    "assets/textures/blue_skybox/bkg1_right.png",
-    "assets/textures/blue_skybox/bkg1_left.png",
-    "assets/textures/blue_skybox/bkg1_top.png",
-    "assets/textures/blue_skybox/bkg1_bot.png",
-    "assets/textures/blue_skybox/bkg1_front.png",
-    "assets/textures/blue_skybox/bkg1_back.png",
-  });
+  assets.addTexture("wood-diff", "assets/textures/wood/wood_table_001_diff_4k.jpg");
+  assets.addTexture("wood-spec", "assets/textures/wood/wood_table_001_rough_4k.jpg", TextureType::Specular);
+  assets.addTexture("wood-norm", "assets/textures/wood/wood_table_001_nor_gl_4k.jpg", TextureType::Normal);
+
   assets.addCubemap("skybox-lightblue", {
     "assets/textures/lightblue/right.png",
     "assets/textures/lightblue/left.png",
@@ -139,15 +132,9 @@ void App::loadAssets() {
     "assets/textures/lightblue/front.png",
     "assets/textures/lightblue/back.png",
   });
-  */
-  assets.addCubemap("skybox-lightblue", {
-    "assets/textures/lightblue/right.png",
-    "assets/textures/lightblue/left.png",
-    "assets/textures/lightblue/top.png",
-    "assets/textures/lightblue/bot.png",
-    "assets/textures/lightblue/front.png",
-    "assets/textures/lightblue/back.png",
-  });
+
+  model.loadModel("assets/objects/robo-boodie.obj");
+
   skybox.create();
 }
 
@@ -213,24 +200,27 @@ void App::loop() {
   double lastFrameTime = 0.0;
   Time::Timer timer, performanceInfoTimer;
   while(running) {
+    glfwPollEvents();
     timeAccumulator += timer.restart();
     inputHandler();
 
+    bool shouldRender = false;
     while(timeAccumulator >= dt) {
       tickCounter++;
       update();
       timeAccumulator -= dt;
+      shouldRender = true;
     }
-    render();
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    if(shouldRender) {
+      render();
+      fpsCounter++;
+    }
 
     if(performanceInfoTimer.count() > 1.) {
       performanceInfoTimer.restart();
       showPerformanceInfo();
       checkGLerrors(__LINE__);
     }
-    fpsCounter++;
   }
 }
 
@@ -243,6 +233,10 @@ void App::inputHandler() {
     auto& basic = assets.getShader("basic2");
     basic.destroy();
     basic = {"assets/shaders/basic2"};
+
+    auto& skyboxShader = assets.getShader("skybox");
+    skyboxShader.destroy();
+    skyboxShader = {"assets/shaders/skybox"};
   }
 }
 
@@ -270,15 +264,20 @@ void App::update() {
 void App::render() {
   prepareRender();
 
-  mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
+  mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera, assets);
   skybox.render(
     assets.getShader("skybox"),
     assets.getCubemap("skybox-lightblue"),
     camera
   );
+  finalizeRender();
 }
 
 void App::prepareRender() {
   glClearColor(0.1, 0.2, 0.3, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void App::finalizeRender() {
+  glfwSwapBuffers(window);
 }

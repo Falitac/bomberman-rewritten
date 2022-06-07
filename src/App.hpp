@@ -18,6 +18,7 @@
 #include "AssetManager.hpp"
 #include "utility/GLUtils.hpp"
 #include "graphics/Mesh.hpp"
+#include "graphics/Model.hpp"
 
 class App {
 public:
@@ -63,6 +64,7 @@ private:
   void update();
   void render();
   void prepareRender();
+  void finalizeRender();
 
   GLFWwindow* window;
   int width;
@@ -80,4 +82,5 @@ private:
   CameraPtr camera;
   Skybox skybox;
   Mesh mesh;
+  Model model;
 };

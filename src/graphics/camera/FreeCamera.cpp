@@ -96,12 +96,15 @@ void FreeCamera::calculateVectors() {
     glm::sin(glm::radians(yaw)) * cosPitch
   };
   right = glm::normalize(glm::cross(direction, up));
+
+  view = glm::lookAt(position, position + direction, up);
+  projection = glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
 }
 
-glm::mat4 FreeCamera::getView() {
-  return glm::lookAt(position, position + direction, up);
+glm::mat4& FreeCamera::getView() {
+  return view;
 }
 
-glm::mat4 FreeCamera::getProjection() {
-  return glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
+glm::mat4& FreeCamera::getProjection() {
+  return projection;
 }

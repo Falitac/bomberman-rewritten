@@ -2,10 +2,12 @@
 
 #include <string.h>
 #include <iostream>
-#include <fmt/core.h>
-#include <fmt/color.h>
 #include <array>
 #include <memory>
+
+#include <fmt/core.h>
+#include <fmt/color.h>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const std::string& shaderName) {
   compile(shaderName);
@@ -114,6 +116,8 @@ GLint Shader::findUniform(const std::string& uniformName) {
   return variableLocations[uniformName];
 }
 
-void Shader::use() {
-  glUseProgram(programID);
+void Shader::passMVP(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
+  glUniformMatrix4fv(findUniform("Model"), 1, false, glm::value_ptr(model));
+  glUniformMatrix4fv(findUniform("View"), 1, false, glm::value_ptr(view));
+  glUniformMatrix4fv(findUniform("Projection"), 1, false, glm::value_ptr(projection));
 }

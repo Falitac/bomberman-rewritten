@@ -8,8 +8,8 @@ class FreeCamera :public Camera {
 public:
   FreeCamera(glm::vec3 position = {}, float fov = 45., float sensititivity = 0.1f, float speed = 4.f);
 
-  virtual glm::mat4 getView();
-  virtual glm::mat4 getProjection();
+  virtual glm::mat4& getView();
+  virtual glm::mat4& getProjection();
   virtual void handleInput(App& app);
 
   inline void setSensitivity(float sensitivity) {

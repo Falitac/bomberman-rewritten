@@ -10,7 +10,8 @@ Texture::Texture(const std::string& location) {
   }
 }
 
-void Texture::loadFromFile(const std::string& location) {
+void Texture::loadFromFile(const std::string& location, TextureType textureType) {
+  this->textureType = textureType;
   location.c_str();
   int width, height, channels;
   auto data = stbi_load(location.c_str(), &width, &height, &channels, 4);

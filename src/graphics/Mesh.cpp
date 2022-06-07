@@ -3,10 +3,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Mesh::Mesh() {
-
 }
 
-void Mesh::loadData(std::vector<Vertex>& vertices, std::vector<GLuint>& indices) {
+void Mesh::loadData(const std::vector<Vertex>& vertices,
+                    const std::vector<GLuint>& indices, 
+                    const std::vector<std::string>& textures) {
   create();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -14,21 +15,50 @@ void Mesh::loadData(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-  
+
+  verticesCount = indices.size();
+  appliedTextures = textures;
 }
 
-void Mesh::render(Shader& shader, const glm::mat4& model, CameraPtr& camera) {
+void Mesh::render(Shader& shader,
+                  const glm::mat4& model, 
+                  const CameraPtr& camera,
+                  AssetManager& assets) {
   glBindVertexArray(vao);
 
   shader.use();
-  auto view = camera->getView();
-  auto projection = camera->getProjection();
-  glUniformMatrix4fv(shader.findUniform("Model"), 1, false, glm::value_ptr(model));
-  glUniformMatrix4fv(shader.findUniform("View"), 1, false, glm::value_ptr(view));
-  glUniformMatrix4fv(shader.findUniform("Projection"), 1, false, glm::value_ptr(projection));
+  shader.passMVP(model, camera->getView(), camera->getProjection());
   glUniform3fv(shader.findUniform("CameraPos"), 1, glm::value_ptr(camera->getPosition()));
 
+  passTexturesToShader(shader, assets);
+
   glDrawElements(GL_TRIANGLES, verticesCount, GL_UNSIGNED_INT, nullptr);
+  glBindVertexArray(0);
+  glActiveTexture(GL_TEXTURE0);
+}
+
+void Mesh::passTexturesToShader(Shader& shader, AssetManager& assets) {
+  unsigned diffuseId = 0;
+  unsigned specularId = 0;
+  unsigned normalId = 0;
+  for(auto i = 0; i < appliedTextures.size(); i++) {
+    glActiveTexture(GL_TEXTURE0 + i);
+    auto& texture = assets.getTexture(appliedTextures[i]);
+
+    std::string name = "Texture";
+    switch(texture.getType()) {
+    case TextureType::Diffuse:
+      name += fmt::format("Diffuse{}", diffuseId++); break;
+    case TextureType::Specular:
+      name += fmt::format("Specular{}", specularId++); break;
+    case TextureType::Normal:
+      name += fmt::format("Normal{}", normalId++); break;
+    default: name += "Default"; break;
+    }
+
+    glUniform1i(shader.findUniform(name), i);
+    texture.use();
+  }
 }
 
 void Mesh::destroy() {

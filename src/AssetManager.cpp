@@ -13,12 +13,15 @@ AssetManager::~AssetManager() {
 }
 
 void AssetManager::addTexture(const std::string& name,
-                              const std::string& location) {
+                              const std::string& location,
+                              TextureType type) {
   if(textures.contains(name)) {
     fmt::print(fmt::fg(fmt::color::sea_green), "Texture {} already exists\n");
     return;
   }
-  textures.insert(std::make_pair(name, Texture{location}));
+  Texture texture;
+  texture.loadFromFile(location, type);
+  textures.insert(std::make_pair(name, std::move(texture)));
 }
 
 void AssetManager::addCubemap(const std::string& name,
@@ -29,7 +32,7 @@ void AssetManager::addCubemap(const std::string& name,
   }
   Cubemap cubemap;
   cubemap.loadFromFile(locations);
-  cubemaps.insert(std::make_pair(name, cubemap));
+  cubemaps.insert(std::make_pair(name, std::move(cubemap)));
 }
 
 void AssetManager::addShader(const std::string& name,

@@ -12,7 +12,7 @@ class AssetManager {
     AssetManager() = default;
     ~AssetManager();
 
-    void addTexture(const std::string& name, const std::string& location);
+    void addTexture(const std::string& name, const std::string& location, TextureType type = TextureType::Diffuse);
     void addCubemap(const std::string& name, const std::array<std::string, 6>& locations);
     void addShader(const std::string& name, const std::string& location);
 

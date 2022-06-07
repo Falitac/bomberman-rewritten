@@ -1,13 +1,15 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <fmt/core.h>
-#include <fmt/color.h>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
 #include <exception>
+
+#include <GL/glew.h>
+#include <fmt/core.h>
+#include <fmt/color.h>
+#include <glm/glm.hpp>
 
 class Shader {
 private:
@@ -18,18 +20,21 @@ public:
   Shader() = default;
   Shader(const std::string& shaderName);
 
-  inline GLuint getProgramID() const {
+  const inline GLuint getProgramID() const {
     return programID;
   }
+  const inline GLuint operator()() const {
+    return programID;
+  }
+  inline void use() const {
+    glUseProgram(programID);
+  }
 
-  void use();
   void destroy();
   GLint findVar(const std::string& varName);
   GLint findUniform(const std::string& uniformName);
 
-  const inline GLuint operator()() const {
-    return programID;
-  }
+  void passMVP(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
 
 private:
   std::string loadFromFileContent(const std::string& shaderName);
