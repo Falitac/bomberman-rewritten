@@ -12,6 +12,11 @@
 class Mesh {
 public:
   Mesh();
+  Mesh(const std::vector<Vertex>& vertices,
+       const std::vector<GLuint>& indices, 
+       const std::vector<std::string>& textures) {
+        loadData(vertices, indices, textures);
+  }
 
   void loadData(const std::vector<Vertex>& vertices,
                 const std::vector<GLuint>& indices, 
@@ -19,8 +24,8 @@ public:
 
   void render(Shader& shader,
               const glm::mat4& model, 
-              const CameraPtr& camera,
-              AssetManager& assets);
+              const CameraPtr& camera
+              );
   void destroy();
 private:
   GLuint vao;
@@ -31,6 +36,6 @@ private:
 
   std::vector<std::string> appliedTextures;
 
-  void passTexturesToShader(Shader& shader, AssetManager& assets);
+  void passTexturesToShader(Shader& shader);
   void create();
 };

@@ -44,7 +44,7 @@ public:
   void hideCursor();
   void showCursor();
 
-  friend class Input;
+  AssetManager assets;
   Input input;
 private:
   void init();
@@ -78,9 +78,12 @@ private:
   int tickCounter = 0;
   int fpsCounter = 0;
 
-  AssetManager assets;
   CameraPtr camera;
   Skybox skybox;
   Mesh mesh;
   Model model;
+
+  friend class Input;
 };
+
+extern App* _App;

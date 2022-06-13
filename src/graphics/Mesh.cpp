@@ -1,13 +1,21 @@
 #include "Mesh.hpp"
+#include "../App.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
-Mesh::Mesh() {
+App* _App;
+
+Mesh::Mesh()
+: vao(0)
+, vbo(0)
+, ebo(0)
+{
 }
 
 void Mesh::loadData(const std::vector<Vertex>& vertices,
                     const std::vector<GLuint>& indices, 
                     const std::vector<std::string>& textures) {
+  fmt::print("Kinda sus\n");
   create();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -22,22 +30,22 @@ void Mesh::loadData(const std::vector<Vertex>& vertices,
 
 void Mesh::render(Shader& shader,
                   const glm::mat4& model, 
-                  const CameraPtr& camera,
-                  AssetManager& assets) {
+                  const CameraPtr& camera) {
   glBindVertexArray(vao);
 
   shader.use();
   shader.passMVP(model, camera->getView(), camera->getProjection());
   glUniform3fv(shader.findUniform("CameraPos"), 1, glm::value_ptr(camera->getPosition()));
 
-  passTexturesToShader(shader, assets);
+  passTexturesToShader(shader);
 
   glDrawElements(GL_TRIANGLES, verticesCount, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
   glActiveTexture(GL_TEXTURE0);
 }
 
-void Mesh::passTexturesToShader(Shader& shader, AssetManager& assets) {
+void Mesh::passTexturesToShader(Shader& shader) {
+  auto& assets = _App->assets;
   unsigned diffuseId = 0;
   unsigned specularId = 0;
   unsigned normalId = 0;

@@ -5,7 +5,7 @@ project(Bomberman VERSION 0.01)
 add_subdirectory(fmt)
 add_subdirectory(freetype)
 
-find_package(Freetype REQUIRED)
+#find_package(Freetype REQUIRED)
 
 file(GLOB_RECURSE SRC "src/*.cpp" "src/*.cc")
 add_executable(Bomberman ${SRC})

@@ -2,17 +2,13 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-static App* app;
-extern AssetManager& _Assets;
-
-static auto basicShaderLocation = std::string{"assets/shaders/basic"};
 
 App::App()
 : width(1600)
 , height(900)
 , running(true)
 {
-  app = this;
+  _App = this;
 }
 
 App::~App() {
@@ -111,6 +107,7 @@ void App::initializeOpenGLOptions() {
 
 void App::loadAssets() {
   try {
+    auto basicShaderLocation = std::string{"assets/shaders/basic"};
     assets.addShader("basic", basicShaderLocation);
     assets.addShader("basic2", "assets/shaders/basic2");
     assets.addShader("skybox", "assets/shaders/skybox");
@@ -133,66 +130,9 @@ void App::loadAssets() {
     "assets/textures/lightblue/back.png",
   });
 
-  model.loadModel("assets/objects/robo-boodie.obj");
+  model.loadModel("assets/objects/cube.obj");
 
   skybox.create();
-}
-
-void App::initializeCallbacks() {
-  glfwSetWindowUserPointer(window, app);
-
-  auto errorCallback = [](int error_code, const char* description) {
-    fmt::print(fmt::fg(fmt::color::red), "GLFW error: {}\n", description);
-  };
-  auto mouseCallback = [](GLFWwindow* window, int button, int action, int mods) {
-    static_cast<App*>(glfwGetWindowUserPointer(window))->mouseCallback(window, button, action, mods);
-  };
-  auto cursorPosCallback = [](GLFWwindow* window, double xpos, double ypos) {
-    static_cast<App*>(glfwGetWindowUserPointer(window))->windowSizeCallback(window, xpos, ypos);
-  };
-  auto keyboardCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-    static_cast<App*>(glfwGetWindowUserPointer(window))->keyboardCallback(window, key, scancode, action, mods);
-  };
-  auto windowSizeCallback = [](GLFWwindow* window, int width, int height) {
-    static_cast<App*>(glfwGetWindowUserPointer(window))->windowSizeCallback(window, width, height);
-  };
-
-  glfwSetErrorCallback(errorCallback);
-  glfwSetMouseButtonCallback(window, mouseCallback);
-  glfwSetCursorPosCallback(window, cursorPosCallback);
-  glfwSetKeyCallback(window, keyboardCallback);
-  glfwSetWindowSizeCallback(window, windowSizeCallback);
-}
-
-void App::mouseCallback(GLFWwindow* window, int button, int action, int mods) {
-  app->input.setMouseButtonPressed(button, action);
-}
-
-void App::windowSizeCallback(GLFWwindow* window, double xpos, double ypos) {
-  app->input.setMousePosition(xpos, ypos);
-}
-
-void App::keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if(action == GLFW_PRESS) {
-    app->input.setKeyPressed(key, true);
-  }
-  if(action == GLFW_RELEASE) {
-    app->input.setKeyPressed(key, false);
-  }
-}
-
-void App::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  static int printCounter;
-  if(printCounter > 20) {
-    printCounter = 0;
-    fmt::print(fmt::fg(fmt::color::aquamarine),
-      "Window new dimensions {}x{}\n", width, height);
-  }
-  printCounter++;
-
-  glViewport(0, 0, width, height);
-  this->width = width;
-  this->height = height;
 }
 
 void App::loop() {
@@ -264,7 +204,8 @@ void App::update() {
 void App::render() {
   prepareRender();
 
-  mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera, assets);
+  //mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
+  model.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
   skybox.render(
     assets.getShader("skybox"),
     assets.getCubemap("skybox-lightblue"),
