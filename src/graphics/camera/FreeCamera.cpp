@@ -2,7 +2,7 @@
 #include "FreeCamera.hpp"
 
 #include <algorithm>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <fmt/core.h>
