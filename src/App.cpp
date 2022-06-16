@@ -2,6 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <thread>
 
 App::App()
 : width(1600)
@@ -15,7 +16,6 @@ App::~App() {
   fmt::print("Test~App()\n");
 
   skybox.destroy();
-  mesh.destroy();
   glfwTerminate();
 }
 
@@ -26,6 +26,7 @@ void App::run() {
 }
 
 void App::init() {
+  fmt::print("Before window init\n");
   initializeWindowContext();
   initializeOpenGLOptions();
   initializeCallbacks();
@@ -35,48 +36,8 @@ void App::init() {
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
 
-  std::vector<glm::vec3> pos = {
-    {-1.f, -1.f, -1.f},
-    {1.f, -1.f, -1.f},
-    {1.f, 1.f, -1.f},
-    {-1.f, 1.f, -1.f},
-    {-1.f, -1.f, 1.f},
-    {1.f, -1.f, 1.f},
-    {1.f, 1.f, 1.f},
-    {-1.f, 1.f, 1.f}
-  };
-  std::vector<glm::vec3> normals(8);
-  for(int i = 0; i < pos.size(); i++) {
-    normals[i] = glm::normalize(pos[i]);
-  }
-  std::vector<unsigned int> indices = {
-    0, 1, 3, 3, 1, 2,
-    1, 5, 2, 2, 5, 6,
-    5, 4, 6, 6, 4, 7,
-    4, 0, 7, 7, 0, 3,
-    3, 2, 7, 7, 2, 6,
-    4, 5, 0, 0, 5, 1
-  };
-  std::vector<glm::vec2> uvs = {
-    {0.0, 0.0},
-    {0.0, 1.0},
-    {1.0, 1.0},
-    {1.0, 0.0},
-    {0.0, 0.0},
-    {0.0, 1.0},
-    {1.0, 1.0},
-    {1.0, 0.0},
-  };
-  std::vector<Vertex> vertices;
-
-  for(int i = 0; i < pos.size(); i++) {
-    Vertex v{pos[i], normals[i], uvs[i]};
-    vertices.push_back(std::move(v));
-  }
-
-  mesh.loadData(vertices, indices, {"wood-diff", "wood-spec", "wood-norm"});
-
   timeSinceStart.restart();
+  fmt::print("Init finished, starting program\n");
 }
 
 void App::initializeWindowContext() {
@@ -106,6 +67,8 @@ void App::initializeOpenGLOptions() {
 }
 
 void App::loadAssets() {
+  auto baseTexturePath = std::string{"assets/textures/"};
+
   try {
     auto basicShaderLocation = std::string{"assets/shaders/basic"};
     assets.addShader("basic", basicShaderLocation);
@@ -115,8 +78,10 @@ void App::loadAssets() {
     fmt::print(stderr, fmt::fg(fmt::color::red), "{}", e.what());
   }
 
-  assets.addTexture("low-poly", "assets/textures/low-poly.png");
+  assets.addTexture("colorPalette", "assets/textures/color-palette.png");
+  checkGLerrors(__LINE__);
 
+/*
   assets.addTexture("wood-diff", "assets/textures/wood/wood_table_001_diff_4k.jpg");
   assets.addTexture("wood-spec", "assets/textures/wood/wood_table_001_rough_4k.jpg", TextureType::Specular);
   assets.addTexture("wood-norm", "assets/textures/wood/wood_table_001_nor_gl_4k.jpg", TextureType::Normal);
@@ -129,10 +94,20 @@ void App::loadAssets() {
     "assets/textures/lightblue/front.png",
     "assets/textures/lightblue/back.png",
   });
+  */
+  assets.addCubemap("forest", {
+    baseTexturePath + "forest/px.png",
+    baseTexturePath + "forest/nx.png",
+    baseTexturePath + "forest/py.png",
+    baseTexturePath + "forest/ny.png",
+    baseTexturePath + "forest/pz.png",
+    baseTexturePath + "forest/nz.png",
+  });
 
-  model.loadModel("assets/objects/cube.obj");
+  model.loadModel("assets/objects/bomberman.obj");
 
   skybox.create();
+  checkGLerrors(__LINE__);
 }
 
 void App::loop() {
@@ -170,9 +145,9 @@ void App::inputHandler() {
   }
   if(input.checkSinglePress(GLFW_KEY_Z)) {
     fmt::print(fmt::fg(fmt::color::beige), "Shader reload\n");
-    auto& basic = assets.getShader("basic2");
+    auto& basic = assets.getShader("basic");
     basic.destroy();
-    basic = {"assets/shaders/basic2"};
+    basic = {"assets/shaders/basic"};
 
     auto& skyboxShader = assets.getShader("skybox");
     skyboxShader.destroy();
@@ -204,11 +179,11 @@ void App::update() {
 void App::render() {
   prepareRender();
 
-  //mesh.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
-  model.render(assets.getShader("basic2"), glm::mat4{1.f}, camera);
+  model.render(assets.getShader("basic"), glm::mat4{1.f}, camera);
+
   skybox.render(
     assets.getShader("skybox"),
-    assets.getCubemap("skybox-lightblue"),
+    assets.getCubemap("forest"),
     camera
   );
   finalizeRender();

@@ -3,6 +3,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+
 App* _App;
 
 Mesh::Mesh()
@@ -15,7 +16,6 @@ Mesh::Mesh()
 void Mesh::loadData(const std::vector<Vertex>& vertices,
                     const std::vector<GLuint>& indices, 
                     const std::vector<std::string>& textures) {
-  fmt::print("Kinda sus\n");
   create();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -31,6 +31,9 @@ void Mesh::loadData(const std::vector<Vertex>& vertices,
 void Mesh::render(Shader& shader,
                   const glm::mat4& model, 
                   const CameraPtr& camera) {
+  auto& cubemap = _App->assets.getCubemap("forest");
+  glActiveTexture(GL_TEXTURE0);
+  cubemap.use();
   glBindVertexArray(vao);
 
   shader.use();

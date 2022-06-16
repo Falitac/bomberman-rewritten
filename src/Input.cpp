@@ -46,7 +46,9 @@ void Input::setMousePosition(double xpos, double ypos) {
   mouse.ypos = ypos;
 }
 
+// To repair, doesn't work on touchpad
 glm::vec2 Input::centerizeMouse(App& app) {
+  static int ticker;
   double xpos, ypos;
   glfwGetCursorPos(app.window, &xpos, &ypos);
   glfwSetCursorPos(app.window, app.getWidth() / 2, app.getHeight() / 2);

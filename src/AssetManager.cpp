@@ -1,5 +1,6 @@
 #include "AssetManager.hpp"
 
+
 AssetManager::~AssetManager() {
   for(auto& [name, texture] : textures) {
     texture.destroy();

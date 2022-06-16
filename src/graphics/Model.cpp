@@ -3,6 +3,8 @@
 #include <fmt/core.h>
 #include <fmt/color.h>
 
+#include "../App.hpp"
+
 Model::Model() {
 
 }
@@ -34,10 +36,8 @@ void Model::loadModel(const std::string& path) {
     vertices = parseVertices(mesh);
     indices = parseFaces(mesh);
 
-    fmt::print("Indices count: {}\n", indices.size());
-
     Mesh newMesh;
-    newMesh.loadData(vertices, indices, {"wood-diff", "wood-spec", "wood-norm"});
+    newMesh.loadData(vertices, indices, {"colorPalette"});
     meshes.push_back(std::move(newMesh));
   }
 }
@@ -46,7 +46,8 @@ std::vector<Vertex> Model::parseVertices(aiMesh*& mesh) {
   if(!mesh) {
     return {};
   }
-  std::vector<Vertex> result(mesh->mNumVertices);
+  std::vector<Vertex> result;
+  result.reserve(mesh->mNumVertices);
 
   for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
     Vertex vertex;
@@ -81,7 +82,7 @@ std::vector<uint32_t> Model::parseFaces(aiMesh*& mesh) {
   for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
     auto face = mesh->mFaces[i];
     for(uint32_t j = 0; j < face.mNumIndices; j++) {
-      result.emplace_back(face.mIndices[i]);
+      result.emplace_back(face.mIndices[j]);
     }
   }
   
