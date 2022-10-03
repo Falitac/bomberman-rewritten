@@ -22,10 +22,7 @@ public:
                 const std::vector<GLuint>& indices, 
                 const std::vector<std::string>& textures);
 
-  void render(Shader& shader,
-              const glm::mat4& model, 
-              const CameraPtr& camera
-              );
+  void render(Shader& shader);
   void destroy();
 private:
   GLuint vao;

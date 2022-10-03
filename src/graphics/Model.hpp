@@ -12,10 +12,7 @@ public:
   Model();
 
   void loadModel(const std::string& path);
-
-  void render(Shader& shader,
-              const glm::mat4& model, 
-              const CameraPtr& camera);
+  void render(Shader& shader);
 
 private:
   std::vector<Mesh> meshes;

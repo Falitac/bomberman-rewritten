@@ -12,8 +12,7 @@ class Skybox {
 public:
   Skybox();
 
-  void render(Shader& shader, Cubemap& cubemap,
-              const CameraPtr& camera);
+  void render(Shader& shader, Cubemap& cubemap);
   void create();
   void destroy();
 private:

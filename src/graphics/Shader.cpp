@@ -121,3 +121,27 @@ void Shader::passMVP(const glm::mat4& model, const glm::mat4& view, const glm::m
   glUniformMatrix4fv(findUniform("View"), 1, false, glm::value_ptr(view));
   glUniformMatrix4fv(findUniform("Projection"), 1, false, glm::value_ptr(projection));
 }
+
+void Shader::passUniform(const std::string& name, const glm::mat2& data) {
+  glUniformMatrix2fv(findUniform(name), 1, false, glm::value_ptr(data));
+}
+
+void Shader::passUniform(const std::string& name, const glm::mat3& data) {
+  glUniformMatrix3fv(findUniform(name), 1, false, glm::value_ptr(data));
+}
+
+void Shader::passUniform(const std::string& name, const glm::mat4& data) {
+  glUniformMatrix4fv(findUniform(name), 1, false, glm::value_ptr(data));
+}
+
+void Shader::passUniform(const std::string& name, const glm::vec2& data) {
+  glUniform2fv(findUniform(name), 1, glm::value_ptr(data));
+}
+
+void Shader::passUniform(const std::string& name, const glm::vec3& data) {
+  glUniform3fv(findUniform(name), 1, glm::value_ptr(data));
+}
+
+void Shader::passUniform(const std::string& name, const float& data) {
+  glUniform1f(findUniform(name), data);
+}

@@ -35,6 +35,12 @@ public:
   GLint findUniform(const std::string& uniformName);
 
   void passMVP(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
+  void passUniform(const std::string& name, const glm::mat2& data);
+  void passUniform(const std::string& name, const glm::mat3& data);
+  void passUniform(const std::string& name, const glm::mat4& data);
+  void passUniform(const std::string& name, const glm::vec2& data);
+  void passUniform(const std::string& name, const glm::vec3& data);
+  void passUniform(const std::string& name, const float& data);
 
 private:
   std::string loadFromFileContent(const std::string& shaderName);

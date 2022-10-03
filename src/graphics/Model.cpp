@@ -89,10 +89,8 @@ std::vector<uint32_t> Model::parseFaces(aiMesh*& mesh) {
   return result;
 }
 
-void Model::render(Shader& shader,
-                  const glm::mat4& model, 
-                  const CameraPtr& camera) {
+void Model::render(Shader& shader) {
   for(auto& mesh : meshes) {
-    mesh.render(shader, model, camera);
+    mesh.render(shader);
   }
 }

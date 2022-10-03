@@ -14,8 +14,6 @@ App::App()
 
 App::~App() {
   fmt::print("Test~App()\n");
-
-  skybox.destroy();
   glfwTerminate();
 }
 
@@ -35,6 +33,8 @@ void App::init() {
   FreeCamera freeCamera({0.f, 1.f, 3.f});
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
+
+  level = std::make_unique<Level>(20, 10, 1.f);
 
   timeSinceStart.restart();
   fmt::print("Init finished, starting program\n");
@@ -79,9 +79,6 @@ void App::loadAssets() {
   }
 
   assets.addTexture("colorPalette", "assets/textures/color-palette.png");
-  checkGLerrors(__LINE__);
-
-/*
   assets.addTexture("wood-diff", "assets/textures/wood/wood_table_001_diff_4k.jpg");
   assets.addTexture("wood-spec", "assets/textures/wood/wood_table_001_rough_4k.jpg", TextureType::Specular);
   assets.addTexture("wood-norm", "assets/textures/wood/wood_table_001_nor_gl_4k.jpg", TextureType::Normal);
@@ -94,19 +91,6 @@ void App::loadAssets() {
     "assets/textures/lightblue/front.png",
     "assets/textures/lightblue/back.png",
   });
-  */
-  assets.addCubemap("forest", {
-    baseTexturePath + "forest/px.png",
-    baseTexturePath + "forest/nx.png",
-    baseTexturePath + "forest/py.png",
-    baseTexturePath + "forest/ny.png",
-    baseTexturePath + "forest/pz.png",
-    baseTexturePath + "forest/nz.png",
-  });
-
-  model.loadModel("assets/objects/bomberman.obj");
-
-  skybox.create();
   checkGLerrors(__LINE__);
 }
 
@@ -149,9 +133,18 @@ void App::inputHandler() {
     basic.destroy();
     basic = {"assets/shaders/basic"};
 
+    auto& basic2 = assets.getShader("basic2");
+    basic2.destroy();
+    basic2 = {"assets/shaders/basic2"};
+
     auto& skyboxShader = assets.getShader("skybox");
     skyboxShader.destroy();
     skyboxShader = {"assets/shaders/skybox"};
+
+    auto skyboxUniform = basic2.findUniform("skybox");
+    auto diffuseUniform = basic2.findUniform("TextureDiffuse0");
+    fmt::print("SkyboxUniform.{}\n", skyboxUniform);
+    fmt::print("DiffuseUniform.{}\n", diffuseUniform);
   }
 }
 
@@ -174,23 +167,17 @@ void App::showCursor() {
 
 void App::update() {
   camera->handleInput(*this);
+  level->update();
 }
 
 void App::render() {
   prepareRender();
-
-  model.render(assets.getShader("basic"), glm::mat4{1.f}, camera);
-
-  skybox.render(
-    assets.getShader("skybox"),
-    assets.getCubemap("forest"),
-    camera
-  );
+  level->render();
   finalizeRender();
 }
 
 void App::prepareRender() {
-  glClearColor(0.1, 0.2, 0.3, 1.0);
+  glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

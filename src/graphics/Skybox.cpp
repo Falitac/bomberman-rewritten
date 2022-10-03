@@ -7,22 +7,12 @@
 Skybox::Skybox() {
 }
 
-void Skybox::render(Shader& shader, Cubemap& cubemap,
-                    const CameraPtr& camera) {
+void Skybox::render(Shader& shader, Cubemap& cubemap) {
   glDepthFunc(GL_LEQUAL);
-  glBindVertexArray(vao);
-  
-  glActiveTexture(GL_TEXTURE0);
   cubemap.use();
   shader.use();
-
-  auto view = glm::mat4{glm::mat3{camera->getView()}};
-  auto& projection = camera->getProjection();
-  auto uViewID = shader.findUniform("View");
-  auto uProjectionID = shader.findUniform("Projection");
-
-  glUniformMatrix4fv(uViewID, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(uProjectionID, 1, GL_FALSE, glm::value_ptr(projection));
+  glBindVertexArray(vao);
+  glActiveTexture(GL_TEXTURE0);
 
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
   glDepthFunc(GL_LESS);

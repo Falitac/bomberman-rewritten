@@ -28,18 +28,11 @@ void Mesh::loadData(const std::vector<Vertex>& vertices,
   appliedTextures = textures;
 }
 
-void Mesh::render(Shader& shader,
-                  const glm::mat4& model, 
-                  const CameraPtr& camera) {
-  auto& cubemap = _App->assets.getCubemap("forest");
+void Mesh::render(Shader& shader) {
   glActiveTexture(GL_TEXTURE0);
-  cubemap.use();
   glBindVertexArray(vao);
 
   shader.use();
-  shader.passMVP(model, camera->getView(), camera->getProjection());
-  glUniform3fv(shader.findUniform("CameraPos"), 1, glm::value_ptr(camera->getPosition()));
-
   passTexturesToShader(shader);
 
   glDrawElements(GL_TRIANGLES, verticesCount, GL_UNSIGNED_INT, nullptr);

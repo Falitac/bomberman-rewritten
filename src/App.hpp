@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include <fmt/core.h>
 #include <fmt/color.h>
@@ -19,6 +20,9 @@
 #include "utility/GLUtils.hpp"
 #include "graphics/Mesh.hpp"
 #include "graphics/Model.hpp"
+#include "Level.hpp"
+
+class Level;
 
 class App {
 public:
@@ -40,6 +44,10 @@ public:
   inline double getDt() {
       return dt;
   }
+  const CameraPtr& getCamera() {
+    return camera;
+  }
+
   void close();
   void hideCursor();
   void showCursor();
@@ -78,10 +86,8 @@ private:
   int tickCounter = 0;
   int fpsCounter = 0;
 
+  std::unique_ptr<Level> level;
   CameraPtr camera;
-  Skybox skybox;
-  Mesh mesh;
-  Model model;
 
   friend class Input;
 };
