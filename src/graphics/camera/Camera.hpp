@@ -9,19 +9,30 @@ class App;
 
 class Camera {
 public:
-  // @TODO change to returning by reference
-  virtual glm::mat4& getView() = 0;
-  virtual glm::mat4& getProjection() = 0;
-  inline glm::vec3& getPosition() {
-    return position;
+  Camera(glm::vec3 position, float fov = 45.f) 
+  : fov(fov)
+  , position(position) {
   }
+  virtual ~Camera()
+  { }
 
   virtual void handleInput(App& app) = 0;
+
+  glm::vec3& getPosition() {
+    return position;
+  }
+  glm::mat4& getView() {
+    return view;
+  }
+  glm::mat4& getProjection() {
+    return projection;
+  }
 
 protected:
   glm::mat4 view;
   glm::mat4 projection;
   glm::vec3 position;
+  float fov;
   float aspect;
 };
 

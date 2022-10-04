@@ -8,7 +8,7 @@
 #include <fmt/core.h>
 
 FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float speed)
-: fov(fov)
+: Camera(position, fov)
 , pitch(0.f)
 , yaw (-90.f)
 , up(glm::vec3{0.f, 1.f, 0.f})
@@ -17,7 +17,6 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
 , maxOffsetHistory(16)
 {
   assert(maxOffsetHistory < 32);
-  this->position = position;
 }
 
 void FreeCamera::handleInput(App& app) {
@@ -99,12 +98,4 @@ void FreeCamera::calculateVectors() {
 
   view = glm::lookAt(position, position + direction, up);
   projection = glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
-}
-
-glm::mat4& FreeCamera::getView() {
-  return view;
-}
-
-glm::mat4& FreeCamera::getProjection() {
-  return projection;
 }

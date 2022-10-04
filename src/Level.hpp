@@ -19,8 +19,11 @@ public:
   void render();
 
 private:
-  int width;
-  int height;
+  uint32_t rows;
+  uint32_t cols;
+
+  float width;
+  float height;
 
   Skybox skybox;
   Mesh mesh;
@@ -29,7 +32,9 @@ private:
   Player player;
   BoardData board;
   Mesh boardPlane;
-  Model playerModel;
   Model bombModel;
+  Model playerModel;
   std::vector<Bomb> bombs;
+
+  friend class Player;
 };

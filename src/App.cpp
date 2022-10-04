@@ -33,6 +33,7 @@ void App::init() {
   FreeCamera freeCamera({0.f, 1.f, 3.f});
   freeCamera.setSensitivity(0.08f);
   camera = std::make_unique<FreeCamera>(freeCamera);
+  TopDownCamera topdownCamera(camerapoint);
 
   level = std::make_unique<Level>(20, 10, 1.f);
 
@@ -146,6 +147,15 @@ void App::inputHandler() {
     fmt::print("SkyboxUniform.{}\n", skyboxUniform);
     fmt::print("DiffuseUniform.{}\n", diffuseUniform);
   }
+  if(input.checkSinglePress(GLFW_KEY_O)) {
+    FreeCamera freeCamera({0.f, 1.f, 3.f});
+    freeCamera.setSensitivity(0.08f);
+    camera = std::make_unique<FreeCamera>(freeCamera);
+  }
+  if(input.checkSinglePress(GLFW_KEY_P)) {
+    TopDownCamera topdownCamera(camerapoint);
+    camera = std::make_unique<TopDownCamera>(topdownCamera);
+  }
 }
 
 void App::showPerformanceInfo() {
@@ -166,8 +176,8 @@ void App::showCursor() {
 }
 
 void App::update() {
-  camera->handleInput(*this);
   level->update();
+  camera->handleInput(*this);
 }
 
 void App::render() {

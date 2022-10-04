@@ -2,7 +2,9 @@
 
 #include <fmt/core.h>
 
-Level::Level(uint32_t rows, uint32_t cols, float boxSize) {
+Level::Level(uint32_t rows, uint32_t cols, float boxSize)
+: rows(rows)
+, cols(cols) {
   std::vector<Vertex> vertices = {
     {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
     {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -13,9 +15,9 @@ Level::Level(uint32_t rows, uint32_t cols, float boxSize) {
     0, 1, 2,
     0, 2, 3
   };
-  
-  float height = rows * boxSize;
-  float width = cols * boxSize;
+
+  height = rows * boxSize;
+  width = cols * boxSize;
   vertices[1].pos.x *= width;
   vertices[2].pos.z *= height;
   vertices[2].pos.x *= width;
@@ -34,7 +36,7 @@ Level::~Level() {
 }
 
 void Level::update() {
-  
+  player.update(*this);
 }
 
 void Level::render() {
@@ -48,10 +50,14 @@ void Level::render() {
   shader.passUniform("CameraPos", camera.getPosition());
   boardPlane.render(shader);
 
+  shader.passUniform("Model", player.getModelMat4());
+  playerModel.render(shader);
+
   auto& skyboxShader = assets.getShader("skybox");
   skyboxShader.use();
   auto viewportDownscaled = glm::mat4{glm::mat3{camera.getView()}};
   skyboxShader.passUniform("View", viewportDownscaled);
   skyboxShader.passUniform("Projection", camera.getProjection());
+
   skybox.render(skyboxShader, assets.getCubemap("skybox-lightblue"));
 }

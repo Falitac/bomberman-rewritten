@@ -16,6 +16,7 @@
 #include "graphics/Skybox.hpp"
 #include "graphics/camera/Camera.hpp"
 #include "graphics/camera/FreeCamera.hpp"
+#include "graphics/camera/TopDownCamera.hpp"
 #include "AssetManager.hpp"
 #include "utility/GLUtils.hpp"
 #include "graphics/Mesh.hpp"
@@ -44,8 +45,15 @@ public:
   inline double getDt() {
       return dt;
   }
+  double getTimeSinceStart() {
+    return timeSinceStart();
+  }
   const CameraPtr& getCamera() {
     return camera;
+  }
+
+  void setCameraPoint(glm::vec3 newPoint) {
+    camerapoint = newPoint;
   }
 
   void close();
@@ -88,6 +96,7 @@ private:
 
   std::unique_ptr<Level> level;
   CameraPtr camera;
+  glm::vec3 camerapoint;
 
   friend class Input;
 };
