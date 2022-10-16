@@ -71,7 +71,7 @@ private:
   void loadAssets();
 
   void mouseCallback(GLFWwindow* window, int button, int action, int mods);
-  void windowSizeCallback(GLFWwindow* window, double xpos, double ypos);
+  void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
   void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
   void windowSizeCallback(GLFWwindow* window, int width, int height);
 

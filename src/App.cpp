@@ -35,7 +35,7 @@ void App::init() {
   camera = std::make_unique<FreeCamera>(freeCamera);
   TopDownCamera topdownCamera(camerapoint);
 
-  level = std::make_unique<Level>(20, 10, 1.f);
+  level = std::make_unique<Level>(25, 25, 2.f);
 
   timeSinceStart.restart();
   fmt::print("Init finished, starting program\n");
@@ -49,7 +49,7 @@ void App::initializeWindowContext() {
 
   glfwWindowHint(GLFW_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_VERSION_MINOR, 5);
-  window = glfwCreateWindow(width, height, "App", nullptr, nullptr);
+  window = glfwCreateWindow(width, height, "Bomberman", nullptr, nullptr);
   if(!window) {
     throw std::runtime_error("Window cannot be initialized");
   }
@@ -153,7 +153,7 @@ void App::inputHandler() {
     camera = std::make_unique<FreeCamera>(freeCamera);
   }
   if(input.checkSinglePress(GLFW_KEY_P)) {
-    TopDownCamera topdownCamera(camerapoint);
+    TopDownCamera topdownCamera(camerapoint, 45.f, 20.f);
     camera = std::make_unique<TopDownCamera>(topdownCamera);
   }
 }
@@ -177,6 +177,7 @@ void App::showCursor() {
 
 void App::update() {
   level->update();
+  camera->setAspect(getAspect());
   camera->handleInput(*this);
 }
 

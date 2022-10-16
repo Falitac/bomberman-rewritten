@@ -9,6 +9,10 @@ public:
 
 protected:
   glm::vec3& pointToLookAt;
+  glm::vec3 velocity;
+  glm::vec3 previousPosition;
+  float cameraFollowCoefficient;
+  float followAngle;
   float height;
 
 };

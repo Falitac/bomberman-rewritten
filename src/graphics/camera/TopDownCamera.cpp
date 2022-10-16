@@ -8,13 +8,25 @@ TopDownCamera::TopDownCamera(glm::vec3& pointToLookAt, float fov, float height)
 : Camera({}, fov)
 , pointToLookAt(pointToLookAt)
 , height(height)
+, velocity(0.f)
+, cameraFollowCoefficient(0.93f)
+, followAngle(0.f)
 {
-
 }
 
 void TopDownCamera::handleInput(App& app) {
-  aspect = app.getAspect();
-  position = pointToLookAt + glm::vec3{0.0f, height, -1.0f};
-  view = glm::lookAt(position, pointToLookAt, glm::vec3{0.f, 1.0f, 0.f});
-  projection = glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
+  auto radius = 3.f;
+
+  auto offset = glm::vec3{
+    glm::cos(followAngle) * radius,
+    height,
+    glm::sin(followAngle) * radius,
+    };
+
+  auto pointDiff = position - pointToLookAt;
+  position = pointToLookAt + pointDiff * cameraFollowCoefficient;
+  followAngle = followAngle - glm::dot(glm::normalize(pointDiff), offset - glm::vec3{0.f, height, 0.f});
+
+  view = glm::lookAt(offset + position, position + (pointToLookAt - position), glm::vec3{0.f, 1.0f, 0.f});
+  projection = glm::perspective(glm::radians(fov), aspect, nearView, farView);
 }

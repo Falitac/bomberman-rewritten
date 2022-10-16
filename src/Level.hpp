@@ -34,6 +34,7 @@ private:
   Mesh boardPlane;
   Model bombModel;
   Model playerModel;
+  Model cube;
   std::vector<Bomb> bombs;
 
   friend class Player;

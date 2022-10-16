@@ -26,6 +26,7 @@ Level::Level(uint32_t rows, uint32_t cols, float boxSize)
 
   bombModel.loadModel("assets/objects/bomb.obj");
   playerModel.loadModel("assets/objects/robo-boodie.obj");
+  cube.loadModel("assets/objects/cube.obj");
 
   skybox.create();
 }
@@ -52,6 +53,9 @@ void Level::render() {
 
   shader.passUniform("Model", player.getModelMat4());
   playerModel.render(shader);
+
+  shader.passUniform("Model", glm::mat4{1.f});
+  cube.render(shader);
 
   auto& skyboxShader = assets.getShader("skybox");
   skyboxShader.use();

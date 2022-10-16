@@ -10,7 +10,7 @@ void App::initializeCallbacks() {
     static_cast<App*>(glfwGetWindowUserPointer(window))->mouseCallback(window, button, action, mods);
   };
   auto cursorPosCallback = [](GLFWwindow* window, double xpos, double ypos) {
-    static_cast<App*>(glfwGetWindowUserPointer(window))->windowSizeCallback(window, xpos, ypos);
+    static_cast<App*>(glfwGetWindowUserPointer(window))->cursorPosCallback(window, xpos, ypos);
   };
   auto keyboardCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
     static_cast<App*>(glfwGetWindowUserPointer(window))->keyboardCallback(window, key, scancode, action, mods);
@@ -30,7 +30,7 @@ void App::mouseCallback(GLFWwindow* window, int button, int action, int mods) {
   _App->input.setMouseButtonPressed(button, action);
 }
 
-void App::windowSizeCallback(GLFWwindow* window, double xpos, double ypos) {
+void App::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
   _App->input.setMousePosition(xpos, ypos);
 }
 

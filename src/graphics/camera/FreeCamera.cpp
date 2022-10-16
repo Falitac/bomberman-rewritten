@@ -22,8 +22,6 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
 void FreeCamera::handleInput(App& app) {
   float dt = app.getDt();
   Input& input = app.input;
-  aspect = app.getAspect();
-
 
   if(input.isKeyPressed(GLFW_KEY_SPACE)) {
     app.hideCursor();
@@ -97,5 +95,5 @@ void FreeCamera::calculateVectors() {
   right = glm::normalize(glm::cross(direction, up));
 
   view = glm::lookAt(position, position + direction, up);
-  projection = glm::perspective(glm::radians(fov), aspect, 0.1f, 600.f);
+  projection = glm::perspective(glm::radians(fov), aspect, nearView, farView);
 }
