@@ -11,6 +11,7 @@ file(GLOB_RECURSE SRC "src/*.cpp" "src/*.cc")
 add_executable(Bomberman ${SRC})
 set_property(TARGET Bomberman PROPERTY CXX_STANDARD 20)
 
+find_package(fmt)
 target_link_libraries(Bomberman fmt::fmt)
 
 if(WIN32)

@@ -18,9 +18,9 @@ void TopDownCamera::handleInput(App& app) {
   auto radius = 3.f;
 
   auto offset = glm::vec3{
-    glm::cos(followAngle) * radius,
+    0.f,
     height,
-    glm::sin(followAngle) * radius,
+    0.f
     };
 
   auto pointDiff = position - pointToLookAt;
