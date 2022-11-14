@@ -8,6 +8,7 @@ This project is still WIP. I use C++ and OpenGL to render things. All models (bo
   <li>Assimp</li>
   <li>Freetype</li>
   <li>fmt</li>
+  <li>stb_image.h</li>
 </ul>
 </p>
 <h3>Screens from previous project:</h3>
