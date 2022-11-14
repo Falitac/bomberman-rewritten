@@ -2,18 +2,20 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
 
 class Level;
 
 class Entity {
 public:
-  virtual void update(Level& level) = 0;
-  virtual void render() = 0;
+  virtual void update(Level& level) { };
+  virtual void render() { };
 
 protected:
   float health;
   glm::vec3 position;
   glm::vec3 bounds;
+
 };
 
 

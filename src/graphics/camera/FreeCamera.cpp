@@ -19,16 +19,16 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
   assert(maxOffsetHistory < 32);
 }
 
-void FreeCamera::handleInput(App& app) {
-  float dt = app.getDt();
-  Input& input = app.input;
+void FreeCamera::handleInput() {
+  float dt = _App->getDt();
+  Input& input = _App->input;
 
   if(input.isKeyPressed(GLFW_KEY_SPACE)) {
-    app.hideCursor();
-    auto mouseOffset = input.centerizeMouse(app);
+    _App->hideCursor();
+    auto mouseOffset = input.centerizeMouse(*_App);
     calculateAngleChanges(mouseOffset);
   } else {
-    app.showCursor();
+    _App->showCursor();
   }
   calculatePosition(input, dt);
   calculateVectors();

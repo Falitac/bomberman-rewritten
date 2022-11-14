@@ -16,10 +16,9 @@ public:
   , farView(far)
   {
   }
-  virtual ~Camera()
-  { }
+  virtual ~Camera() { }
 
-  virtual void handleInput(App& app) = 0;
+  virtual void handleInput() = 0;
 
   glm::vec3& getPosition() {
     return position;

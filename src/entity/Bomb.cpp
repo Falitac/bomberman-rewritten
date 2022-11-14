@@ -1,9 +1,10 @@
 #include "Bomb.hpp"
+#include "../Level.hpp"
 
-Bomb::Bomb() {
+void Bomb::update(Level& level) {
 
 }
 
-Bomb::~Bomb() {
+void Bomb::render() {
 
 }

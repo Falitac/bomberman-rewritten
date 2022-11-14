@@ -8,6 +8,9 @@
 class Cubemap  {
 public:
     Cubemap();
+    Cubemap(Cubemap&) = delete;
+    Cubemap operator=(Cubemap&) = delete;
+    Cubemap(Cubemap&&) = default;
 
     void loadFromFile(const std::array<std::string, 6>& locations);
     inline void use() {

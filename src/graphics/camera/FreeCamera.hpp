@@ -8,7 +8,7 @@ class FreeCamera : public Camera {
 public:
   FreeCamera(glm::vec3 position = {}, float fov = 45., float sensititivity = 0.1f, float speed = 4.f);
 
-  virtual void handleInput(App& app);
+  virtual void handleInput();
 
   inline void setSensitivity(float sensitivity) {
     this->sensitivity = sensitivity;

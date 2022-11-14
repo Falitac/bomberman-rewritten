@@ -2,6 +2,7 @@
 
 #include <glm/ext.hpp>
 #include "../App.hpp"
+#include "../Level.hpp"
 
 Player::Player() {
   position = glm::vec3{0.0f};

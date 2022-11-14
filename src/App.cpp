@@ -1,8 +1,8 @@
 #include "App.hpp"
 
+#include "Level.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
-#include <thread>
 
 App::App()
 : width(1600)
@@ -148,7 +148,7 @@ void App::inputHandler() {
     fmt::print("DiffuseUniform.{}\n", diffuseUniform);
   }
   if(input.checkSinglePress(GLFW_KEY_O)) {
-    FreeCamera freeCamera({0.f, 1.f, 3.f});
+    FreeCamera freeCamera({0.f, 1.f, 3.f}, 50.f);
     freeCamera.setSensitivity(0.08f);
     camera = std::make_unique<FreeCamera>(freeCamera);
   }
@@ -178,7 +178,7 @@ void App::showCursor() {
 void App::update() {
   level->update();
   camera->setAspect(getAspect());
-  camera->handleInput(*this);
+  camera->handleInput();
 }
 
 void App::render() {
