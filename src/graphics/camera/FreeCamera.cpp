@@ -19,7 +19,7 @@ FreeCamera::FreeCamera(glm::vec3 position, float fov, float sensititivity, float
   assert(maxOffsetHistory < 32);
 }
 
-void FreeCamera::handleInput() {
+void FreeCamera::update() {
   float dt = _App->getDt();
   Input& input = _App->input;
 

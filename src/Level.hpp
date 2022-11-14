@@ -24,6 +24,9 @@ public:
   void render();
 
   BlockType& getBlock(size_t x, size_t y) { return board[y * rows + x]; }
+  auto getBlockSize() { return boxSize; }
+  auto getRowCount() { return rows; }
+  auto getColCount() { return cols; }
 
 private:
   uint32_t rows;

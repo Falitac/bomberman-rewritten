@@ -18,7 +18,7 @@ public:
   }
   virtual ~Camera() { }
 
-  virtual void handleInput() = 0;
+  virtual void update() = 0;
 
   glm::vec3& getPosition() {
     return position;

@@ -153,7 +153,7 @@ void App::inputHandler() {
     camera = std::make_unique<FreeCamera>(freeCamera);
   }
   if(input.checkSinglePress(GLFW_KEY_P)) {
-    TopDownCamera topdownCamera(camerapoint, 45.f, 20.f);
+    TopDownCamera topdownCamera(camerapoint, 80.f, 7.f);
     camera = std::make_unique<TopDownCamera>(topdownCamera);
   }
 }
@@ -178,7 +178,7 @@ void App::showCursor() {
 void App::update() {
   level->update();
   camera->setAspect(getAspect());
-  camera->handleInput();
+  camera->update();
 }
 
 void App::render() {

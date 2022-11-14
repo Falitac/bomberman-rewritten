@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include "../AABB.hpp"
 
 class Level;
 
@@ -14,8 +15,7 @@ public:
 protected:
   float health;
   glm::vec3 position;
-  glm::vec3 bounds;
-
+  AABB aabb;
 };
 
 

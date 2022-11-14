@@ -23,6 +23,8 @@ public:
   }
   float getSpeed() { return speed; };
 private:
+  void collision(Level& level);
+private:
   glm::mat4 model;
   float speed;
 };
