@@ -4,20 +4,13 @@ bool AABB::isCollidingAABB(AABB& other) {
   sort();
   other.sort();
 
-  if(collider.second.x >= other.collider.first.x &&
-     collider.second.y >= other.collider.first.y  &&
-     collider.second.z >= other.collider.first.z 
-  ) {
-    if(collider.second.x > other.collider.first.x) return false;
-    if(collider.second.y > other.collider.first.y) return false;
-    if(collider.second.z > other.collider.first.z) return false;
-  } else {
-    if(collider.second.x < other.collider.first.x) return false;
-    if(collider.second.y < other.collider.first.y) return false;
-    if(collider.second.z < other.collider.first.z) return false;
-  }
-
-  return true;
+  return
+    collider.first.x <= other.collider.second.x &&
+    collider.second.x >= other.collider.first.x &&
+    collider.first.y <= other.collider.second.y &&
+    collider.second.y >= other.collider.first.y &&
+    collider.first.z <= other.collider.second.z &&
+    collider.second.z >= other.collider.first.z ;
 }
 
 void AABB::sort() {

@@ -10,6 +10,7 @@ add_subdirectory(freetype)
 file(GLOB_RECURSE SRC "src/*.cpp" "src/*.cc")
 add_executable(Bomberman ${SRC})
 set_property(TARGET Bomberman PROPERTY CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 20)
 
 target_link_libraries(Bomberman fmt::fmt)
 
@@ -27,6 +28,7 @@ if(UNIX)
   target_link_libraries(Bomberman assimp)
 endif()
 
+
 # google tests:
 include(FetchContent)
 FetchContent_Declare(
@@ -42,6 +44,7 @@ enable_testing()
 add_executable(
   ${PROJECT_NAME}-test
   "tests/Tests.cc"
+  "src/AABB.cpp"
 )
 target_link_libraries(
   ${PROJECT_NAME}-test
