@@ -7,6 +7,8 @@ public:
 
   virtual void update();
 
+  glm::vec3 offset;
+
 protected:
   glm::vec3& pointToLookAt;
   glm::vec3 velocity;

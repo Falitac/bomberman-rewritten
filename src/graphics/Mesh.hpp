@@ -12,6 +12,8 @@
 class Mesh {
 public:
   Mesh();
+  Mesh(Mesh& other) = delete;
+  Mesh(Mesh&& other) = default;
   Mesh(const std::vector<Vertex>& vertices,
        const std::vector<GLuint>& indices, 
        const std::vector<std::string>& textures) {

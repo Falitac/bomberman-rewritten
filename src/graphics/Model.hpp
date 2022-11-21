@@ -10,6 +10,8 @@
 class Model {
 public:
   Model();
+  Model(Model& other) = delete;
+  Model(Model&& other) = default;
 
   void loadModel(const std::string& path);
   void render(Shader& shader);

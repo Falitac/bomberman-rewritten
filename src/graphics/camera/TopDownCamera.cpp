@@ -11,17 +11,12 @@ TopDownCamera::TopDownCamera(glm::vec3& pointToLookAt, float fov, float height)
 , velocity(0.f)
 , cameraFollowCoefficient(0.93f)
 , followAngle(0.f)
+, offset({-4., height, 0.f})
 {
 }
 
 void TopDownCamera::update() {
   auto radius = 3.f;
-
-  auto offset = glm::vec3{
-    3.f,
-    height,
-    2.f
-  };
 
   auto pointDirection = glm::normalize(position - pointToLookAt);
   position = pointToLookAt + pointDirection * cameraFollowCoefficient;

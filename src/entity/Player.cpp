@@ -5,7 +5,7 @@
 #include "../Level.hpp"
 
 Player::Player() {
-  position = glm::vec3{0.0f};
+  position = glm::vec3{5.0f, 0.f, 5.f};
   speed = 10.f;
 }
 
@@ -50,7 +50,6 @@ void Player::collision(Level& level) {
   aabb.setFirstCorner(position - glm::vec3{0.5});
   aabb.setSecondCorner(position + glm::vec3{0.5});
 
-  int counter = 0;
   for(int y = 0; y < level.getRowCount(); y++) {
     for(int x = 0; x < level.getColCount(); x++) {
       auto block = level.getBlock(x, y);
@@ -61,14 +60,15 @@ void Player::collision(Level& level) {
       AABB blockAABB;
       blockAABB.setFirstCorner(blockOffset - glm::vec3{level.getBlockSize() * .5f});
       blockAABB.setSecondCorner(blockOffset + glm::vec3{level.getBlockSize() * .5f});
-      if(blockAABB.isCollidingAABB(aabb)) {
-        //fmt::print("Block collision at [{}, {}]\n", x, y);
-        counter++;
+      while(blockAABB.isCollidingAABB(aabb)) {
+        fmt::print("Block collision at [{}, {}]\n", x, y);
+
+        position += (position - blockOffset ) * static_cast<float>(_App->getDt()) * 1.1f;
+        aabb.setFirstCorner(position - glm::vec3{0.5});
+        aabb.setSecondCorner(position + glm::vec3{0.5});
       };
     }
   }
-  if(counter != 0)
-    fmt::print("Collision count: {}\n", counter);
 
 }
 
